@@ -55,6 +55,17 @@ app.get('/', (req, res) => {
   res.send('Knovia API is running');
 });
 
+// Clear all chunks (for re-uploading after docId fix)
+app.delete('/api/chunks', async (req, res) => {
+  try {
+    const result = await Chunk.deleteMany({});
+    console.log(`Deleted ${result.deletedCount} chunks`);
+    res.json({ success: true, deleted: result.deletedCount });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Upload route (Phase 2 & 3)
 app.post('/api/upload', upload.single('document'), async (req, res) => {
   if (!req.file) {
@@ -81,7 +92,7 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
     console.log(`Document chunked into ${chunks.length} chunks.`);
     
     // Phase 5: Embeddings & Phase 6: MongoDB Storage
-    const docId = req.file.filename;
+    const docId = req.file.originalname;
     let savedChunks = 0;
 
     if (chunks.length > 0) {
