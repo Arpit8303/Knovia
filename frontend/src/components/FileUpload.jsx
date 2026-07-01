@@ -61,7 +61,7 @@ export default function FileUpload({ onUploadSuccess }) {
 
       // Brief pause so user sees step 4 complete
       await new Promise(r => setTimeout(r, 600));
-      onUploadSuccess({ fileName: data.fileName, chunkCount: data.chunkCount });
+      onUploadSuccess({ fileName: data.fileName, docId: data.docId, chunkCount: data.chunkCount });
     } catch (err) {
       setError(err.message);
       setUploading(false);

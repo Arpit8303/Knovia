@@ -276,6 +276,24 @@ body {
   color: var(--muted);
 }
 
+.clear-history-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11px;
+  font-family: var(--sans);
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+.clear-history-btn:hover {
+  background: #2d1a1a;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
 .chat-messages {
   flex: 1;
   overflow-y: auto;

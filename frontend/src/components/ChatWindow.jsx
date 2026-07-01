@@ -1,19 +1,78 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+const STORAGE_KEY = 'knovia_chat_history';
+
+// Helper: get all saved histories
+function getAllHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+// Helper: get history for a specific doc
+function getDocHistory(docName) {
+  const all = getAllHistory();
+  return all[docName] || null;
+}
+
+// Helper: save history for a specific doc
+function saveDocHistory(docName, messages) {
+  const all = getAllHistory();
+  all[docName] = messages;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
+
+// Helper: clear history for a specific doc
+function clearDocHistory(docName) {
+  const all = getAllHistory();
+  delete all[docName];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
 
 export default function ChatWindow({ llmProvider, activeDoc }) {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: `Hello! I am Knovia. I have read **${activeDoc?.fileName}**. What would you like to know?`,
-    },
-  ]);
+  const docName = activeDoc?.fileName || 'unknown';
+
+  const getWelcomeMessage = useCallback(() => ({
+    role: 'assistant',
+    content: `Hello! I am Knovia. I have read **${docName}**. What would you like to know?`,
+  }), [docName]);
+
+  const [messages, setMessages] = useState(() => {
+    const saved = getDocHistory(docName);
+    return saved && saved.length > 0 ? saved : [getWelcomeMessage()];
+  });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
 
+  // When activeDoc changes, load that doc's history
+  useEffect(() => {
+    const saved = getDocHistory(docName);
+    if (saved && saved.length > 0) {
+      setMessages(saved);
+    } else {
+      setMessages([getWelcomeMessage()]);
+    }
+    setInput('');
+  }, [docName, getWelcomeMessage]);
+
+  // Save to localStorage whenever messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      saveDocHistory(docName, messages);
+    }
+  }, [messages, docName]);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  const handleClearHistory = () => {
+    clearDocHistory(docName);
+    setMessages([getWelcomeMessage()]);
+  };
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -29,7 +88,7 @@ export default function ChatWindow({ llmProvider, activeDoc }) {
       const res = await fetch(`${apiUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, llmProvider, docId: activeDoc?.fileName }),
+        body: JSON.stringify({ question, llmProvider, docId: activeDoc?.docId || activeDoc?.fileName }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Chat failed');
@@ -56,6 +115,11 @@ export default function ChatWindow({ llmProvider, activeDoc }) {
         <span>Chatting with</span>
         <span className="chat-ctx-doc">{activeDoc?.fileName}</span>
         <span className="chat-ctx-pill">{activeDoc?.chunkCount} chunks indexed</span>
+        {messages.length > 1 && (
+          <button className="clear-history-btn" onClick={handleClearHistory} title="Clear chat history">
+            🗑️ Clear History
+          </button>
+        )}
       </div>
 
       {/* Messages */}

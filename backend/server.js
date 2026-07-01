@@ -112,6 +112,7 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
       success: true, 
       filePath: req.file.path, 
       fileName: req.file.originalname, 
+      docId: docId,
       textPreview: extractedText.substring(0, 200),
       chunkCount: chunks.length,
       savedChunks: savedChunks
