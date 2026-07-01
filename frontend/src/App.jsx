@@ -4,15 +4,29 @@ import ChatWindow from './components/ChatWindow';
 import './index.css';
 
 function App() {
-  // docs = array of { fileName, chunkCount }
+  // docs = array of { id, fileName, docId, chunkCount }
   const [docs, setDocs] = useState([]);
   const [activeDoc, setActiveDoc] = useState(null);
   const [llmProvider, setLlmProvider] = useState('gemini');
   const [showUpload, setShowUpload] = useState(false);
 
   const handleUploadSuccess = (info) => {
-    const newDoc = { fileName: info.fileName, chunkCount: info.chunkCount };
-    setDocs(prev => [...prev, newDoc]);
+    const newDoc = {
+      id: Date.now().toString(),
+      fileName: info.fileName,
+      docId: info.docId || info.fileName,
+      chunkCount: info.chunkCount,
+    };
+    // Replace if same fileName already exists, else add
+    setDocs(prev => {
+      const exists = prev.findIndex(d => d.fileName === newDoc.fileName);
+      if (exists >= 0) {
+        const updated = [...prev];
+        updated[exists] = newDoc;
+        return updated;
+      }
+      return [...prev, newDoc];
+    });
     setActiveDoc(newDoc);
     setShowUpload(false);
   };
@@ -60,10 +74,10 @@ function App() {
           {noDocs ? (
             <div className="sidebar-empty">No documents yet.<br />Upload a file to begin.</div>
           ) : (
-            docs.map((doc, i) => (
+            docs.map((doc) => (
               <div
-                key={i}
-                className={`doc-item ${activeDoc?.fileName === doc.fileName ? 'active' : ''}`}
+                key={doc.id}
+                className={`doc-item ${activeDoc?.id === doc.id ? 'active' : ''}`}
                 onClick={() => { setActiveDoc(doc); setShowUpload(false); }}
               >
                 <span className="doc-icon">📑</span>
@@ -82,7 +96,7 @@ function App() {
           {(noDocs || showUpload) ? (
             <FileUpload onUploadSuccess={handleUploadSuccess} />
           ) : (
-            activeDoc && <ChatWindow llmProvider={llmProvider} activeDoc={activeDoc} />
+            activeDoc && <ChatWindow key={activeDoc.id} llmProvider={llmProvider} activeDoc={activeDoc} />
           )}
         </main>
       </div>
