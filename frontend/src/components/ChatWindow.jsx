@@ -29,7 +29,7 @@ export default function ChatWindow({ llmProvider, activeDoc }) {
       const res = await fetch(`${apiUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, llmProvider }),
+        body: JSON.stringify({ question, llmProvider, docId: activeDoc?.fileName }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Chat failed');

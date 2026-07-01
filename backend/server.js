@@ -152,7 +152,7 @@ app.post('/api/chat', async (req, res) => {
             path: 'embedding',
             queryVector: questionEmbedding,
             numCandidates: 100,
-            limit: 3,
+            limit: 20,
           }
         },
         {
@@ -166,8 +166,12 @@ app.post('/api/chat', async (req, res) => {
         }
       ];
 
-      topChunks = await Chunk.aggregate(pipeline);
-      console.log('Vector search returned', topChunks.length, 'chunks');
+      let rawChunks = await Chunk.aggregate(pipeline);
+      if (docId) {
+        rawChunks = rawChunks.filter(c => c.docId === docId);
+      }
+      topChunks = rawChunks.slice(0, 3);
+      console.log('Vector search returned', topChunks.length, 'chunks for this document');
     } catch (vectorErr) {
       console.warn('Vector search failed (index may not exist):', vectorErr.message);
     }
