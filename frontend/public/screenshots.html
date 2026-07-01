@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>App Screenshots</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #080a0f;
+    font-family: 'Inter', sans-serif;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: #4b5563;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  /* ── SCREENSHOT FRAME ── */
+  .screen {
+    width: 860px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #1e2128;
+    box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px #252932;
+  }
+
+  /* Browser chrome */
+  .browser-bar {
+    background: #1a1d25;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #252932;
+  }
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .url-bar {
+    flex: 1;
+    background: #0d0f14;
+    border: 1px solid #252932;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #6b7280;
+  }
+
+  /* App shell */
+  .app-shell {
+    display: flex;
+    height: 520px;
+    background: #0d0f14;
+  }
+
+  /* Header */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 22px;
+    background: #161921;
+    border-bottom: 1px solid #252932;
+  }
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: #e8eaf0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-dot { width: 8px; height: 8px; background: #5b8ef0; border-radius: 50%; box-shadow: 0 0 8px #5b8ef0; }
+  .hbadge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: #6b7280;
+    background: #1e2128; padding: 3px 8px; border-radius: 4px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 230px;
+    min-width: 230px;
+    background: #161921;
+    border-right: 1px solid #252932;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow: hidden;
+  }
+  .slabel {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #4b5563;
+    padding: 0 4px;
+  }
+  .upload-box {
+    border: 1.5px dashed #252932;
+    border-radius: 10px;
+    padding: 20px 12px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .upload-box .uicon { font-size: 22px; margin-bottom: 6px; }
+  .upload-box .utext { font-size: 11px; color: #6b7280; line-height: 1.5; }
+  .upload-box .utext strong { color: #5b8ef0; font-weight: 500; }
+
+  .doc-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px;
+    border: 1px solid transparent;
+  }
+  .doc-item.active { background: #1e2d4a; border-color: #5b8ef0; }
+  .doc-item:not(.active) { background: #1a1d25; }
+  .dicon { font-size: 14px; flex-shrink: 0; }
+  .dinfo { flex: 1; min-width: 0; }
+  .dname { font-size: 11px; font-weight: 500; color: #e8eaf0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dmeta { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #6b7280; margin-top: 2px; }
+  .dstatus { width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 5px #34d399; flex-shrink: 0; }
+  .dstatus.proc { background: #f59e0b; box-shadow: 0 0 5px #f59e0b; }
+
+  /* Chat */
+  .chat { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .ctx-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 20px;
+    border-bottom: 1px solid #252932;
+    background: #161921;
+  }
+  .ctx-bar span { font-size: 11px; color: #6b7280; font-family: 'IBM Plex Mono', monospace; }
+  .ctx-doc { font-size: 11px; font-weight: 500; color: #5b8ef0; font-family: 'IBM Plex Mono', monospace; }
+  .cpill {
+    margin-left: auto; font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; color: #6b7280; background: #1e2128;
+    padding: 3px 8px; border-radius: 20px;
+  }
+
+  .messages {
+    flex: 1; overflow: hidden;
+    padding: 20px; display: flex; flex-direction: column; gap: 18px;
+  }
+
+  .msg { display: flex; flex-direction: column; gap: 7px; }
+  .msg.user { align-items: flex-end; }
+  .msg.assistant { align-items: flex-start; }
+
+  .bubble {
+    padding: 10px 14px; border-radius: 12px;
+    font-size: 12px; line-height: 1.65; max-width: 76%;
+  }
+  .msg.user .bubble { background: #5b8ef0; color: #fff; border-bottom-right-radius: 3px; }
+  .msg.assistant .bubble { background: #161921; border: 1px solid #252932; color: #e8eaf0; border-bottom-left-radius: 3px; }
+
+  .cite-cards { display: flex; flex-direction: column; gap: 5px; max-width: 82%; }
+  .cite-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #4b5563; letter-spacing: .08em; text-transform: uppercase; }
+  .cite-card {
+    background: #0d2e22; border: 1px solid #1a4035;
+    border-left: 3px solid #34d399; border-radius: 7px; padding: 8px 12px;
+  }
+  .cite-top { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .cnum {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    color: #34d399; background: #0a2419; padding: 2px 6px; border-radius: 3px;
+  }
+  .csrc { font-size: 10px; color: #6b7280; }
+  .cscore { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #374151; margin-left: auto; }
+  .ctext { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b7280; line-height: 1.5; }
+
+  .input-bar {
+    padding: 14px 20px; border-top: 1px solid #252932;
+    background: #161921; display: flex; gap: 8px; align-items: center;
+  }
+  .input-field {
+    flex: 1; background: #0d0f14; border: 1.5px solid #252932;
+    border-radius: 9px; padding: 9px 14px;
+    font-family: 'Inter', sans-serif; font-size: 12px;
+    color: #6b7280;
+  }
+  .send-btn {
+    width: 36px; height: 36px; background: #5b8ef0;
+    border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; font-size: 13px; flex-shrink: 0;
+    color: white;
+  }
+
+  /* ── UPLOAD SCREEN ── */
+  .upload-screen {
+    display: flex; height: 520px; background: #0d0f14;
+  }
+  .upload-main {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px; padding: 40px;
+  }
+  .drop-zone {
+    width: 420px; border: 2px dashed #5b8ef0;
+    border-radius: 16px; padding: 48px 32px; text-align: center;
+    background: #1e2d4a22;
+  }
+  .drop-icon { font-size: 48px; margin-bottom: 16px; }
+  .drop-title { font-size: 16px; font-weight: 600; color: #e8eaf0; margin-bottom: 8px; }
+  .drop-sub { font-size: 12px; color: #6b7280; line-height: 1.6; }
+  .drop-btn {
+    margin-top: 20px; background: #5b8ef0; color: #fff;
+    border: none; border-radius: 8px; padding: 10px 24px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+  }
+  .formats {
+    display: flex; gap: 10px;
+  }
+  .fmt-pill {
+    background: #1a1d25; border: 1px solid #252932;
+    border-radius: 6px; padding: 6px 14px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b7280;
+  }
+
+  /* Processing screen */
+  .proc-bar-wrap {
+    width: 420px; margin-top: 4px;
+  }
+  .proc-steps { display: flex; flex-direction: column; gap: 12px; width: 420px; }
+  .proc-step { display: flex; align-items: center; gap: 12px; }
+  .picon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .picon.done { background: #0d2e22; }
+  .picon.active { background: #1e2d4a; animation: glow 1.2s infinite; }
+  .picon.wait { background: #1a1d25; opacity: .4; }
+  @keyframes glow { 0%,100%{box-shadow:0 0 0 #5b8ef0} 50%{box-shadow:0 0 10px #5b8ef0} }
+  .ptext { font-size: 12px; }
+  .ptext.done { color: #34d399; }
+  .ptext.active { color: #5b8ef0; }
+  .ptext.wait { color: #4b5563; }
+  .prog-bar {
+    height: 3px; background: #1e2128; border-radius: 2px; margin-top: 4px; overflow: hidden;
+  }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, #5b8ef0, #34d399); border-radius: 2px; }
+
+  .screen-group { display: flex; flex-direction: column; gap: 12px; width: 860px; }
+  .screen-caption {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: #4b5563; padding-left: 4px;
+  }
+  .screen-caption strong { color: #6b7280; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ SCREENSHOT 1: UPLOAD ════════════════ -->
+<div class="screen-group">
+  <div class="section-label">Screen 1 of 3</div>
+  <div class="screen">
+    <div class="browser-bar">
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <div class="url-bar">🔒 docchat.vercel.app</div>
+    </div>
+    <div style="background:#161921; padding:12px 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #252932;">
+      <div class="logo"><span class="logo-dot"></span>DocChat</div>
+      <span class="hbadge">Mini-RAG · v1.0</span>
+    </div>
+    <div class="upload-screen">
+      <div class="sidebar">
+        <span class="slabel">Documents</span>
+        <div class="upload-box">
+          <div class="uicon">📄</div>
+          <div class="utext"><strong>Click to upload</strong><br>PDF or TXT · max 20MB</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+          <div style="padding:32px 16px;text-align:center;">
+            <div style="font-size:11px;color:#374151;font-family:'IBM Plex Mono',monospace;">No documents yet</div>
+            <div style="font-size:10px;color:#374151;margin-top:4px;">Upload a file to begin</div>
+          </div>
+        </div>
+      </div>
+      <div class="upload-main">
+        <div class="drop-zone">
+          <div class="drop-icon">📂</div>
+          <div class="drop-title">Drop your document here</div>
+          <div class="drop-sub">Drag & drop a PDF or text file, or click to browse your files</div>
+          <button class="drop-btn">Choose File</button>
+        </div>
+        <div class="formats">
+          <div class="fmt-pill">📄 PDF</div>
+          <div class="fmt-pill">📝 TXT</div>
+          <div class="fmt-pill">📋 MD</div>
+          <div class="fmt-pill">📊 CSV</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="screen-caption"><strong>Screen 1</strong> — Upload screen (empty state, no document yet)</div>
+</div>
+
+<!-- ════════════════ SCREENSHOT 2: PROCESSING ════════════════ -->
+<div class="screen-group">
+  <div class="section-label">Screen 2 of 3</div>
+  <div class="screen">
+    <div class="browser-bar">
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <div class="url-bar">🔒 docchat.vercel.app</div>
+    </div>
+    <div style="background:#161921; padding:12px 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #252932;">
+      <div class="logo"><span class="logo-dot"></span>DocChat</div>
+      <span class="hbadge">Mini-RAG · v1.0</span>
+    </div>
+    <div class="upload-screen">
+      <div class="sidebar">
+        <span class="slabel">Documents</span>
+        <div class="upload-box">
+          <div class="uicon">📄</div>
+          <div class="utext"><strong>Click to upload</strong><br>PDF or TXT · max 20MB</div>
+        </div>
+        <div class="doc-item active">
+          <span class="dicon">📑</span>
+          <div class="dinfo">
+            <div class="dname">ml_textbook.pdf</div>
+            <div class="dmeta">Processing...</div>
+          </div>
+          <div class="dstatus proc"></div>
+        </div>
+      </div>
+      <div class="upload-main">
+        <div style="text-align:center;margin-bottom:8px;">
+          <div style="font-size:15px;font-weight:600;color:#e8eaf0;margin-bottom:4px;">Processing ml_textbook.pdf</div>
+          <div style="font-size:12px;color:#6b7280;font-family:'IBM Plex Mono',monospace;">Please wait while we index your document...</div>
+        </div>
+        <div class="prog-bar" style="width:420px;">
+          <div class="prog-fill" style="width:65%;"></div>
+        </div>
+        <div class="proc-steps">
+          <div class="proc-step">
+            <div class="picon done">✅</div>
+            <div class="ptext done">Text extracted — 48,230 characters</div>
+          </div>
+          <div class="proc-step">
+            <div class="picon done">✅</div>
+            <div class="ptext done">Split into 42 chunks (1500 chars, 300 overlap)</div>
+          </div>
+          <div class="proc-step">
+            <div class="picon active">⚡</div>
+            <div class="ptext active">Generating embeddings via Gemini... (27/42)</div>
+          </div>
+          <div class="proc-step">
+            <div class="picon wait">🗄️</div>
+            <div class="ptext wait">Saving to MongoDB Atlas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="screen-caption"><strong>Screen 2</strong> — Processing screen (PDF being chunked + embedded)</div>
+</div>
+
+<!-- ════════════════ SCREENSHOT 3: CHAT ════════════════ -->
+<div class="screen-group">
+  <div class="section-label">Screen 3 of 3</div>
+  <div class="screen">
+    <div class="browser-bar">
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      <div class="url-bar">🔒 docchat.vercel.app/chat/abc123</div>
+    </div>
+    <div style="background:#161921; padding:12px 22px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #252932;">
+      <div class="logo"><span class="logo-dot"></span>DocChat</div>
+      <span class="hbadge">Mini-RAG · v1.0</span>
+    </div>
+    <div class="app-shell">
+      <div class="sidebar">
+        <span class="slabel">Documents</span>
+        <div class="upload-box">
+          <div class="uicon">📄</div>
+          <div class="utext"><strong>Click to upload</strong><br>PDF or TXT · max 20MB</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="doc-item active">
+            <span class="dicon">📑</span>
+            <div class="dinfo">
+              <div class="dname">ml_textbook.pdf</div>
+              <div class="dmeta">42 chunks · 2.1 MB</div>
+            </div>
+            <div class="dstatus"></div>
+          </div>
+          <div class="doc-item">
+            <span class="dicon">📄</span>
+            <div class="dinfo">
+              <div class="dname">project_notes.txt</div>
+              <div class="dmeta">18 chunks · 84 KB</div>
+            </div>
+            <div class="dstatus"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat">
+        <div class="ctx-bar">
+          <span>Chatting with</span>
+          <span class="ctx-doc">ml_textbook.pdf</span>
+          <span class="cpill">42 chunks indexed</span>
+        </div>
+
+        <div class="messages">
+          <div class="msg user">
+            <div class="bubble">What is gradient descent and how does it work?</div>
+          </div>
+
+          <div class="msg assistant">
+            <div class="bubble">
+              Gradient descent is an optimization algorithm that minimizes a loss function by iteratively moving in the direction of steepest descent [1]. It computes gradients of the loss with respect to each model parameter, then updates parameters opposite to the gradient direction [2].<br><br>
+              The update rule is: <code style="background:#0d0f14;padding:1px 5px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:11px;">θ = θ − α · ∇J(θ)</code>, where α is the learning rate [1].
+            </div>
+            <div class="cite-cards">
+              <span class="cite-label">Sources from document</span>
+              <div class="cite-card">
+                <div class="cite-top">
+                  <span class="cnum">[1]</span>
+                  <span class="csrc">Chunk 7 · Chapter 3: Optimization</span>
+                  <span class="cscore">score 0.91</span>
+                </div>
+                <div class="ctext">"Gradient descent adjusts parameters to minimize cost by moving in the direction of the negative gradient. The learning rate α controls step size..."</div>
+              </div>
+              <div class="cite-card">
+                <div class="cite-top">
+                  <span class="cnum">[2]</span>
+                  <span class="csrc">Chunk 9 · Chapter 3: Backprop</span>
+                  <span class="cscore">score 0.74</span>
+                </div>
+                <div class="ctext">"Gradients are computed via the chain rule, propagating error signals backward through network layers..."</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-bar">
+          <div class="input-field">Ask anything about the document…</div>
+          <div class="send-btn">➤</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="screen-caption"><strong>Screen 3</strong> — Chat screen with answer + green citation cards</div>
+</div>
+
+</body>
+</html>

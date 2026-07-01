@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>How DocChat Works</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0f14;
+    color: #e8eaf0;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 48px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── Two flows side by side ── */
+  .flows {
+    display: flex;
+    gap: 32px;
+    max-width: 960px;
+    margin: 0 auto;
+    align-items: flex-start;
+  }
+
+  .flow {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .flow-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .flow-title.upload { background: #1e2d4a; color: #5b8ef0; }
+  .flow-title.ask    { background: #0d2e22; color: #34d399; }
+
+  /* Step card */
+  .step {
+    width: 100%;
+    background: #161921;
+    border: 1px solid #252932;
+    border-radius: 12px;
+    padding: 16px 18px;
+    position: relative;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .upload .step-num { background: #1e2d4a; color: #5b8ef0; }
+  .ask    .step-num { background: #0d2e22; color: #34d399; }
+
+  .step-icon { font-size: 18px; }
+
+  .step-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e8eaf0;
+  }
+
+  .step-desc {
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.6;
+    margin-left: 36px;
+  }
+
+  /* Code/data pill inside step */
+  .code-pill {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    background: #0d0f14;
+    border: 1px solid #252932;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-top: 8px;
+    margin-left: 36px;
+    color: #5b8ef0;
+    line-height: 1.7;
+  }
+  .ask .code-pill { color: #34d399; }
+
+  /* Chunk visual */
+  .chunks-visual {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+    margin-left: 36px;
+  }
+  .chunk-box {
+    background: #1e2d4a;
+    border: 1px solid #2a3d5e;
+    border-radius: 4px;
+    padding: 3px 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #5b8ef0;
+  }
+  .chunk-box.highlight {
+    background: #0d2e22;
+    border-color: #1a4035;
+    color: #34d399;
+  }
+
+  /* Vector visual */
+  .vector-visual {
+    display: flex;
+    gap: 2px;
+    margin-top: 8px;
+    margin-left: 36px;
+    align-items: flex-end;
+    height: 32px;
+  }
+  .vec-bar {
+    width: 6px;
+    background: #5b8ef0;
+    border-radius: 2px 2px 0 0;
+    opacity: 0.7;
+  }
+
+  /* Arrow connector */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 0;
+    gap: 0;
+  }
+  .arrow-line {
+    width: 2px;
+    height: 20px;
+  }
+  .upload .arrow-line { background: #2a3d5e; }
+  .ask    .arrow-line { background: #1a4035; }
+
+  .arrow-head {
+    font-size: 14px;
+  }
+  .upload .arrow-head { color: #5b8ef0; }
+  .ask    .arrow-head { color: #34d399; }
+
+  .arrow-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: #4b5563;
+    margin-top: 2px;
+  }
+
+  /* Divider between flows */
+  .flow-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 60px;
+    gap: 8px;
+  }
+  .divider-line {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, #252932, transparent);
+  }
+  .divider-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #374151;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* MongoDB badge */
+  .db-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #0f1f14;
+    border: 1px solid #1a4035;
+    border-radius: 8px;
+    padding: 6px 12px;
+    margin-top: 8px;
+    margin-left: 36px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #34d399;
+    width: fit-content;
+  }
+
+  /* Bottom legend */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #252932;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  @media (max-width: 640px) {
+    .flows { flex-direction: column; }
+    .flow-divider { flex-direction: row; padding-top: 0; }
+    .divider-line { width: 80px; height: 1px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>⚡ DocChat — How It Works</h1>
+<p class="subtitle">Two flows: Upload PDF → Ask Question</p>
+
+<div class="flows">
+
+  <!-- ── FLOW 1: UPLOAD ── -->
+  <div class="flow upload">
+    <div class="flow-title upload">📤 Flow 1 — PDF Upload</div>
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <span class="step-icon">📄</span>
+        <div class="step-title">User uploads PDF</div>
+      </div>
+      <div class="step-desc">Frontend sends file to <code>/api/documents</code> via multipart form.</div>
+      <div class="code-pill">POST /api/documents<br>Content-Type: multipart/form-data<br>file: resume.pdf</div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <span class="step-icon">🔍</span>
+        <div class="step-title">Text Extraction</div>
+      </div>
+      <div class="step-desc">Backend uses <strong>pdf-parse</strong> library to extract all raw text from the PDF.</div>
+      <div class="code-pill">"Gradient descent is an optimization algorithm used to minimize a loss function by iteratively..."</div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <span class="step-icon">✂️</span>
+        <div class="step-title">Chunking</div>
+      </div>
+      <div class="step-desc">Text is split into overlapping pieces (~1500 chars each, 300 char overlap) so no context is lost.</div>
+      <div class="chunks-visual">
+        <div class="chunk-box">chunk_1</div>
+        <div class="chunk-box">chunk_2</div>
+        <div class="chunk-box">chunk_3</div>
+        <div class="chunk-box">chunk_4</div>
+        <div class="chunk-box">chunk_5</div>
+        <div class="chunk-box">· · ·</div>
+        <div class="chunk-box">chunk_42</div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <span class="step-icon">🧮</span>
+        <div class="step-title">Embeddings Generate</div>
+      </div>
+      <div class="step-desc">Har chunk ko numbers ke array (vector) mein convert kiya jata hai using <strong>Gemini embedding model</strong>.</div>
+      <div class="code-pill">chunk_1 → [0.12, 0.87, 0.34, ...]<br>chunk_2 → [0.55, 0.21, 0.90, ...]<br>384 numbers per chunk</div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">5</div>
+        <span class="step-icon">🗄️</span>
+        <div class="step-title">Save to MongoDB</div>
+      </div>
+      <div class="step-desc">Chunks + embeddings MongoDB mein save ho jaate hain. Status "ready" ho jaata hai.</div>
+      <div class="db-badge">🍃 MongoDB Atlas · 42 chunks saved</div>
+    </div>
+
+  </div>
+
+  <!-- Divider -->
+  <div class="flow-divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">vs</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- ── FLOW 2: ASK ── -->
+  <div class="flow ask">
+    <div class="flow-title ask">💬 Flow 2 — Ask Question</div>
+
+    <!-- Step 1 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <span class="step-icon">❓</span>
+        <div class="step-title">User types question</div>
+      </div>
+      <div class="step-desc">Frontend sends question to <code>/api/chat</code> with the document ID.</div>
+      <div class="code-pill">POST /api/chat<br>{<br>  documentId: "abc123",<br>  question: "What is gradient descent?"<br>}</div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <span class="step-icon">🧮</span>
+        <div class="step-title">Question → Embedding</div>
+      </div>
+      <div class="step-desc">Question ko bhi usi model se vector mein convert kiya jata hai.</div>
+      <div class="code-pill">"What is gradient descent?"<br>→ [0.44, 0.91, 0.13, ...]</div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <span class="step-icon">🎯</span>
+        <div class="step-title">Find Similar Chunks</div>
+      </div>
+      <div class="step-desc">Question vector aur har chunk vector ke beech <strong>cosine similarity</strong> calculate hoti hai. Top 5 chunks select hote hain.</div>
+      <div class="chunks-visual">
+        <div class="chunk-box highlight">chunk_7 ✦ 0.91</div>
+        <div class="chunk-box highlight">chunk_9 ✦ 0.87</div>
+        <div class="chunk-box highlight">chunk_11 ✦ 0.74</div>
+        <div class="chunk-box" style="opacity:.4">chunk_3 0.12</div>
+        <div class="chunk-box" style="opacity:.4">chunk_1 0.08</div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <span class="step-icon">🤖</span>
+        <div class="step-title">Send to Groq (LLM)</div>
+      </div>
+      <div class="step-desc">Top chunks + question Groq ke LLM (Llama 3) ko bheje jaate hain as context.</div>
+      <div class="code-pill">System: Answer ONLY from these excerpts:<br>[1] chunk_7 text...<br>[2] chunk_9 text...<br>User: What is gradient descent?</div>
+    </div>
+
+    <div class="arrow">
+      <div class="arrow-line"></div>
+      <div class="arrow-head">▼</div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">5</div>
+        <span class="step-icon">✅</span>
+        <div class="step-title">Answer + Citations</div>
+      </div>
+      <div class="step-desc">LLM grounded answer deta hai with [1][2] citation numbers. Frontend mein green cards mein source dikhta hai.</div>
+      <div class="code-pill">"Gradient descent minimizes loss<br>by moving opposite to gradient [1].<br>Learning rate controls step size [2]."</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#5b8ef0"></div>
+    Upload Flow (one time per document)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#34d399"></div>
+    Query Flow (every question)
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#f59e0b"></div>
+    Gemini = Embeddings
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#a78bfa"></div>
+    Groq = LLM Answer
+  </div>
+</div>
+
+</body>
+</html>
